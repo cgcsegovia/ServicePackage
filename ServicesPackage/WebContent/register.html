@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>Registrar usuario</title>
+	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.23/angular.min.js"></script>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css"/>
+	<script src="js/ui-bootstrap-tpls-0.12.0.min.js"></script>
+	<script src="js/constantes.js"></script>
+	<script src="js/controllers/register.js"></script>
+	<script src="js/services/services.js"></script>
+</head>
+<body>
+<div ng-app="app" ng-controller="registroCtrl as vm">
+	<label>Nombre:</label><input type="text" ng-model="vm.name" class="form-control input-lg" placeholder="Nombre">
+	<label>Apellidos:</label><input type="text" ng-model="vm.surname" class="form-control input-lg" placeholder="Apellidos">
+	<label>EMail:</label><input type="text" ng-model="vm.eMail" class="form-control input-lg" placeholder="Correo electrónico">
+	<label>Login:</label><input type="text" ng-model="vm.login" class="form-control input-lg" placeholder="Login">
+	<label>Password:</label><input type="password" ng-model="vm.password" class="form-control input-lg" placeholder="Password">
+	<input type="button" value="Guardar" ng-click="vm.procesarGuardar();" class="btn btn-primary btn-lg btn-block"/>
+</div>
+</body>
+</html>

@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+	<meta charset="UTF-8">
+	<title>Autenticación</title>
+	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.23/angular.min.js"></script>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css"/>
+	<script src="js/ui-bootstrap-tpls-0.12.0.min.js"></script>
+	<script src="js/constantes.js"></script>
+	<script src="js/controllers/autenticacion.js"></script>
+	<script src="js/services/services.js"></script>
+	
+</head>
+<body>
+
+<div ng-app="app" ng-controller="autenticacionCtrl as vm">
+	<label>Login:</label><input type="text" ng-model="vm.login" class="form-control input-lg" placeholder="Login">
+	<label>Password:</label><input type="password" ng-model="vm.password" class="form-control input-lg" placeholder="Password">
+	<input type="button" value="Enviar" ng-click="vm.procesarLogin();" class="btn btn-primary btn-lg btn-block"/>
+	<span class="pull-right"><a href="#" ng-click="vm.procesarIrRegistro();">Registrar</a></span>
+</div>
+
+</body>
+</html>

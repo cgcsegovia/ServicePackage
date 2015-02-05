@@ -1,0 +1,315 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<services>
+	<!-- SUPERUSER: Borra Usuario  -->
+	<service name="delUser" rol="1" bd="cms">
+	  <query src="delete from USER where id = ?" type="delete" name="user">
+	   	  <param type="integer" name="id" not-null="true" />
+	  </query>    
+	</service>
+	<!-- SUPERUSER: Recupera Usuarios ( el password no se recupera ) -->
+	<service name="getUsers" rol="1" bd="cms">
+	  <query src="select u.id, u.name, u.surname, u.email, u.rol_id, u.product_id, u.hq_id, u.merchant_id, u.login, r.descripcion as rol from USER u left join ROL r on u.rol_id = r.id" type="select" name="users">
+	  </query>    
+	</service>
+	<!-- SUPERUSER: Recupera Usuario por Id ( el password no se recupera ) -->
+	<service name="getUserById" rol="1" bd="cms">
+	  <query src="select u.id, u.name, u.surname, u.email, u.rol_id, u.product_id, u.hq_id, u.merchant_id, u.login, r.descripcion as rol from USER u left join ROL r on u.rol_id = r.id where u.id=? " type="select" name="user">
+	      <param type="integer" name="id"/>
+	  </query>    
+	</service>
+	<!-- SUPERUSER: Inserta el Usuario enviando todos los campos -->
+	<service name="putUser" rol="1" bd="cms">
+	  <query src="insert into USER(NAME,SURNAME,EMAIL,LOGIN,PASSWORD,ROL_ID,PRODUCT_ID,HQ_ID,MERCHANT_ID) values(?,?,?,?,MD5(?),?,?,?,?)" type="insert" name="user">
+	      <param type="string" name="name" not-null="true"/>
+	      <param type="string" name="surname"/>
+	      <param type="string" name="email"/>
+	      <param type="string" name="login" not-null="true"/>
+	      <param type="string" name="password" not-null="true"/>
+	      <param type="integer" name="rol_id" not-null="true" />
+	      <param type="integer" name="product_id"  />
+	      <param type="integer" name="hq_id"/>
+	      <param type="integer" name="merchant_id"/>
+	  </query>
+	</service>
+	  <!-- PUBLIC: Inserta el Usuario enviando todos los campos -->
+	<service name="putUserPublic" rol="5" bd="cms">
+	  <query src="insert into USER(NAME,SURNAME,EMAIL,LOGIN,PASSWORD,ROL_ID) values(?,?,?,?,MD5(?),4)" type="insert" name="result">
+	      <param type="string" name="name" not-null="true"/>
+	      <param type="string" name="surname"/>
+	      <param type="email" name="email" />
+	      <param type="string" name="login" not-null="true"/>
+	      <param type="string" name="password" not-null="true"/>
+	  </query>
+	 </service>
+	 <!-- SUPERUSER: Actualiza el Usuario enviando todos los campos -->
+	 <service name="updUser" rol="1" bd="cms">
+	  <query src="update USER set NAME=?,SURNAME=?,EMAIL=?,LOGIN=?,PASSWORD=MD5(?),ROL_ID=?,PRODUCT_ID=?,HQ_ID=?,MERCHANT_ID=? where ID=?" type="change" name="user">
+	      <param type="string" name="name"/>
+	      <param type="string" name="surname"/>
+	      <param type="email" name="email"/>
+	      <param type="string" name="login"/>
+	      <param type="string" name="password"/>
+	      <param type="integer" name="rol_id"/>
+	      <param type="integer" name="product_id"/>
+	      <param type="integer" name="hq_id"/>
+	      <param type="integer" name="merchant_id"/>
+	      <param type="integer" name="id"/>
+   	  </query>        
+	</service>
+	<!-- SUPERUSER: Actualiza el Usuario enviando todos los campos menos pwd-->
+	<service name="updUserSinPwd" rol="1" bd="cms">
+	  <query src="update USER set NAME=?,SURNAME=?,EMAIL=?,LOGIN=?,ROL_ID=?,PRODUCT_ID=?,HQ_ID=?,MERCHANT_ID=? where ID=?" type="change" name="user">
+	      <param type="string" name="name"/>
+	      <param type="string" name="surname"/>
+	      <param type="email" name="email"/>
+	      <param type="string" name="login"/>
+	      <param type="integer" name="rol_id"/>
+	      <param type="integer" name="product_id"/>
+	      <param type="integer" name="hq_id"/>
+	      <param type="integer" name="merchant_id"/>
+	      <param type="integer" name="id"/>
+   	  </query>        
+	</service>
+	<!-- PUBLICO: Todos los roles -->
+	<service name="getRoles" rol="5" bd="cms">
+	  <query src="select id, descripcion from ROL" type="select" name="roles">
+	  </query>
+	</service>
+	<!-- PUBLICO: Todos los roles -->
+	<service name="getRolById" rol="5" bd="cms">
+	  <query src="select id, descripcion from ROL where id=?" type="select" name="rol">
+	  		<param type="integer" name="id" not-null="true"/>
+	  </query>
+	</service>
+	<!-- PRODUCT: Todos los productos -->
+	<service name="getProducts" rol="4" bd="cms">
+	  <query src="select p.id, p.descripcion, p.imagen, p.hq_id, p.precio, hq.descripcion as headquarter from PRODUCT p left join HEADQUARTER hq on p.hq_id=hq.id" type="select" name="products">
+	  </query>
+	</service>
+	<!-- PUBLIC: Todos los productos restringido-->
+	<service name="getProductsbyUser" rol="5" bd="cms">
+	  <query src="select distinct p.id, p.descripcion, p.imagen, p.precio, p.hq_id, h.descripcion as headquarter
+	  			 	from MERCHANT m 
+	  					 inner join HEADQUARTER h on m.id = h.merchant_id
+	  					 inner join PRODUCT p on h.id = p.hq_id
+				   where m.id in(select merchant_id from USER where rol_id=2 and id=?) or 
+					     h.id in(select hq_id from USER where rol_id=3 and id=?) or
+						 p.id in(select product_id from USER where rol_id=4 and id=?)
+						 " type="select" name="products">
+	  		<param type="idUser" name="idUser" not-null="true"/>
+	  		<param type="idUser" name="idUser" not-null="true"/>
+	  		<param type="idUser" name="idUser" not-null="true"/>
+	  </query>
+	</service>
+	<!-- PRODUCT: Producto por id -->
+	<service name="getProductById" rol="4" bd="cms">
+	  <query src="select p.id, p.descripcion, p.imagen, p.hq_id, p.precio, hq.descripcion as headquarter from PRODUCT p left join HEADQUARTER hq on p.hq_id=hq.id where p.id=?" type="select" name="product">
+	      <param type="integer" name="id" not-null="true"/>	  
+	  </query>
+	</service>
+	<!-- PRODUCT: Añadir Producto 
+		Nota: La imagen es <id>.jpg
+	-->
+	<service name="putProduct" rol="4" bd="cms">
+	  <query src="insert into PRODUCT(descripcion, hq_id, precio, imagen) values (?,?,?,?)" type="insert" name="product">
+	      <param type="string" name="descripcion" not-null="true"/>	  
+	      <param type="integer" name="hq_id" not-null="true"/>
+	      <param type="real" name="precio"/>
+	      <param type="string" name="imagen" not-null="true"/>
+	  </query>
+	</service>
+	<!-- PRODUCT: Añadir Producto 
+		Nota: La imagen es <id>.jpg
+	-->
+	<service name="putProductSinImagen" rol="4" bd="cms">
+	  <query src="insert into PRODUCT(descripcion, hq_id, precio, imagen) 
+	  			  SELECT ? as descripcion,? as hq_id, ? as precio, CONCAT((max(id)+1),'.jpg') as imagen from PRODUCT" type="insert" name="product">
+	      <param type="string" name="descripcion" not-null="true"/>	  
+	      <param type="integer" name="hq_id" not-null="true"/>
+	      <param type="real" name="precio"/>
+	  </query>
+	</service>
+	<!-- PRODUCT: Actualizar Producto -->
+	<service name="updProduct" rol="4" bd="cms">
+	  <query src="update PRODUCT set descripcion=?, hq_id=?, precio=?, imagen=? where id=?" type="change" name="product">
+		  <param type="string" name="descripcion" not-null="true"/>	
+		  <param type="integer" name="hq_id"/>	
+		  <param type="real" name="precio"/>
+	      <param type="string" name="imagen" not-null="true"/>	
+	      <param type="integer" name="id" not-null="true"/>	  
+	  </query>
+	</service>	
+	<!-- PRODUCT: Actualizar Producto sin imagen-->
+	<service name="updProductSinImagen" rol="4" bd="cms">
+	  <query src="update PRODUCT set descripcion=?, hq_id=?, precio=? where id=?" type="change" name="product">
+		  <param type="string" name="descripcion" not-null="true"/>	
+		  <param type="integer" name="hq_id"/>
+		  <param type="real" name="precio"/>		
+	      <param type="integer" name="id" not-null="true"/>	  
+	  </query>
+	</service>	
+	<!-- PRODUCT: Borrar Producto -->
+	<service name="delProduct" rol="4" bd="cms">
+	  <query src="delete from PRODUCT where id=?" type="delete" name="product">
+	      <param type="integer" name="id" not-null="true"/>	  
+	  </query>
+	</service>	
+	<!-- HEADQUARTER: Todos las delegaciones -->
+	<service name="getHeadquarters" rol="1" bd="cms">
+	  <query src="select h.id, h.descripcion, h.merchant_id, h.place_id, m.descripcion as merchant, u.direccion as direccion 
+	  				from HEADQUARTER h 
+	  					 left join MERCHANT m on h.merchant_id=m.id
+	  					 left join PLACE u on h.place_id=u.id" type="select" name="headquarters">
+	  </query>
+	</service>
+	<!-- PUBLIC: Todos las delegaciones restringido-->
+	<service name="getHeadquartersbyUser" rol="5" bd="cms">
+	  <query src="select distinct h.id, h.descripcion, h.merchant_id, h.place_id, m.descripcion as merchant
+	  			 	from MERCHANT m 
+	  					 inner join HEADQUARTER h on m.id = h.merchant_id
+	  					 inner join PRODUCT p on h.id = p.hq_id
+				   where m.id in(select merchant_id from USER where rol_id=2 and id=?) or 
+					     h.id in(select hq_id from USER where rol_id=3 and id=?) or
+						 p.id in(select product_id from USER where rol_id=4 and id=?)
+						 " type="select" name="headquarters">
+	  		<param type="idUser" name="idUser" not-null="true"/>
+	  		<param type="idUser" name="idUser" not-null="true"/>
+	  		<param type="idUser" name="idUser" not-null="true"/>
+	  </query>
+	</service>
+	<!-- HEADQUARTER: Headquearter por id -->
+	<service name="getHeadquarterById" rol="3" bd="cms">
+	  <query src="select h.id, h.descripcion, h.merchant_id, h.place_id, p.direccion from HEADQUARTER h left join PLACE p on h.place_id = p.id where h.id=?" type="select" name="headquarter">
+	      <param type="integer" name="id"/>	  
+	  </query>
+	</service>
+	<!-- HEADQUARTER: Añadir Producto -->
+	<service name="putHeadquarter" rol="3" bd="cms">
+	  <query src="insert into HEADQUARTER(descripcion, merchant_id, place_id) values(?, ?, ?)" type="insert" name="headquarter">
+	      <param type="string" name="descripcion" not-null="true"/>	  
+	      <param type="integer" name="merchant_id" not-null="true"/>	
+	      <param type="integer" name="place_id" />
+	  </query>
+	</service>
+	<!-- HEADQUARTER: Actualizar Producto -->
+	<service name="updHeadquarter" rol="3" bd="cms">
+	  <query src="update HEADQUARTER set descripcion=?, merchant_id=?, place_id=? where id=?" type="change" name="headquarter">
+	      <param type="string" name="descripcion" not-null="true"/>		      
+	      <param type="integer" name="merchant_id" not-null="true"/>
+	      <param type="integer" name="place_id"/>	  
+	      <param type="integer" name="id"/>	  
+	  </query>
+	</service>
+	<!-- MERCHANT: Actualizar Producto restringido-->
+	<service name="updHeadquarterByUser" rol="3" bd="cms">
+	  <query src="update HEADQUARTER set descripcion=?, merchant_id=?, place_id=? where id=(select hq_id from USER where id=?)" type="change" name="headquarter">
+	      <param type="string" name="descripcion" not-null="true"/>		      
+	      <param type="integer" name="merchant_id" not-null="true"/>
+	      <param type="integer" name="place_id"/>	  
+	      <param type="idUser" name="idUser" not-null="true"/>	
+	  </query>
+	</service>
+	<!-- SUPERUSER: Borrar Delegación -->
+	<service name="delHeadquarter" rol="1" bd="cms">
+	  <query src="delete from HEADQUARTER where id=?" type="delete" name="headquarter">
+	      <param type="integer" name="id" not-null="true"/>	  
+	  </query>
+	</service>		
+	<!-- PUBLIC: Todos los comerciantes restringido -->
+	<service name="getMerchantsByUser" rol="5" bd="cms">
+	  <query src="select distinct m.id, m.descripcion
+	  				from MERCHANT m 
+	  					 inner join HEADQUARTER h on m.id = h.merchant_id
+	  					 inner join PRODUCT p on h.id = p.hq_id
+				   where m.id in(select merchant_id from USER where rol_id=2 and id=?) or 
+					     h.id in(select hq_id from USER where rol_id=3 and id=?) or
+						 p.id in(select product_id from USER where rol_id=4 and id=?)" type="select" name="merchants">
+	  		<param type="idUser" name="idUser" not-null="true"/>
+	  		<param type="idUser" name="idUser" not-null="true"/>
+	  		<param type="idUser" name="idUser" not-null="true"/>
+	  </query>
+	</service>
+	<!-- SUPERUSER: Todos los comerciantes -->
+	<service name="getMerchants" rol="1" bd="cms">
+	  <query src="select id, descripcion, cif from MERCHANT" type="select" name="merchants">
+	  </query>
+	</service>
+	<!-- SUPERUSER: Comerciante por id -->
+	<service name="getMerchantById" rol="1" bd="cms">
+	  <query src="select id, descripcion from MERCHANT where id=?" type="select" name="merchant">
+	      <param type="integer" name="id"/>	  
+	  </query>
+	</service>
+	<!-- MERCHANT: Comerciante por id restringido-->
+	<service name="getMerchantByIdByUser" rol="2" bd="cms">
+	  <query src="select m.id, m.descripcion from MERCHANT m inner join USER u on m.id = u.merchant_id where u.id = ? and m.id=?" type="select" name="merchant">
+	      <param type="idUser" name="idUser" not-null="true"/>
+	      <param type="integer" name="id"/>	  
+	  </query>
+	</service>
+	<!-- SUPERUSER: Añadir Comerciante -->
+	<service name="putMerchant" rol="1" bd="cms">
+	  <query src="insert into MERCHANT(descripcion) values(?)" type="insert" name="merchant">
+	      <param type="string" name="descripcion"/>	  
+	  </query>
+	</service>
+	<!-- SUPERUSER: Actualizar Comerciante -->
+	<service name="updMerchant" rol="1" bd="cms">
+	  <query src="update MERCHANT set descripcion=? where id=?" type="change" name="merchant">
+	      <param type="string" name="descripcion"/>	
+	      <param type="integer" name="id"/>	  
+	  </query>
+	</service>
+	<!-- MERCHANT: Actualizar Comerciante restringido-->
+	<service name="updMerchantByUser" rol="2" bd="cms">
+	  <query src="update MERCHANT set descripcion=? where id=(select merchant_id from USER where id=?)" type="change" name="merchant">
+	      <param type="string" name="descripcion"/>
+	      <param type="idUser" name="idUser" not-null="true"/>	
+	  </query>
+	</service>
+	<!-- SUPERUSER: Borrar Comerciante -->
+	<service name="delMerchant" rol="1" bd="cms">
+	  <query src="delete from MERCHANT where id=?" type="delete" name="merchant">
+	      <param type="integer" name="id" not-null="true"/>	  
+	  </query>
+	</service>		
+	<!-- PUBLIC: Obtener localizaciones -->
+	<service name="getLocations" rol="5" bd="cms">
+	  <query src="select id as id, direccion as direccion 
+					from PLACE
+					where direccion like CONCAT('%',?,'%') and 
+						  (merchant_id = 
+					(select
+					case t.rol_id
+						when 2 then 
+						t.merchant
+						when 3 then
+						t.headquarter
+						when 4 then 
+						t.product
+					end as merchant_id
+					from 	(select 	u.rol_id, 	
+							(select h.merchant_id 
+							from PRODUCT p
+								 inner join HEADQUARTER h on p.hq_id=h.id
+							where u.product_id=p.id) as product,
+							(select h.merchant_id 
+							from HEADQUARTER h
+							where u.hq_id=h.id) as headquarter,
+							u.merchant_id as merchant
+						 from USER u
+						 where u.id =?) t) or (SELECT 1 FROM USER where rol_id=1 and id=?))" type="select" name="direccion">
+	      <param type="string" name="direccion" not-null="true"/>	  
+	      <param type="idUser" name="idUser" not-null="true"/>
+	       <param type="idUser" name="idUser" not-null="true"/>
+	  </query>
+	</service>		
+	<!-- PUBLIC: Insertar Localizacion -->
+	<service name="putPlace" rol="5" bd="cms">
+	  <query src="insert into PLACE(direccion, merchant_id) values (?, ?)" type="insert" name="place">
+	      <param type="string" name="direccion" not-null="true"/>
+	      <param type="integer" name="merchant_id" not-null="true"/>	  
+	  </query>
+	</service>		
+	
+</services>

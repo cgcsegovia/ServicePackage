@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+	<meta charset="UTF-8">
+	<title>Administración</title>
+	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.23/angular.min.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css"/>
+	<!-- Latest compiled and minified JavaScript -->
+	<script src="../js/ui-bootstrap-tpls-0.12.0.min.js"></script>
+	<script type="text/javascript"   src="https://maps.google.com/maps/api/js?sensor=false"></script>
+	<script src="../js/constantes.js"></script>
+	<script src="../js/services/services.js"></script>
+	<script src="../js/controllers/autenticacion.js"></script>
+	<script src="../js/controllers/admin.js"></script>
+	
+</head>
+<body>
+<div ng-app="app" ng-controller="adminCtrl as vmAdmin">
+		<div ng-app="app" ng-controller="autenticacionCtrl as vmAuth">
+			<div align="left" clear="both">
+				<ul class="breadcrumb">
+					<li><a ng-click="vmAuth.irAPrivado();" href="#">Privado</a><span class="divider"></span></li>
+			  		<li class="active"><a href="#">Administración</a></li>
+				</ul>
+			</div>
+			<div float="left" width="50%">
+				Bienvenido {{vmAuth.authName}}, con rol {{vmAuth.authRol}}. 
+			</div>
+			<div float="left" width="50%" align="right">
+			<a href="#" ng-click="vmAuth.procesarLogout();"><span class="glyphicon glyphicon-log-out">Salir</span></a>
+			</div>
+		</div>
+
+  <label class="checkbox">Abrir sólo una a la vez <input type="checkbox" ng-model="oneAtATime"></label>
+  <!-- USUARIOS -->
+  <accordion close-others="oneAtATime">
+    <accordion-group heading="Gestión de usuarios" is-disabled="vmAdmin.usersDisabled">
+            <div ng-controller="aUsersCtrl as vmUsers">
+     		<pagination total-items="vmUsers.total" ng-model="vmUsers.currentPage" max-size="vmUsers.maxSize" class="pagination-sm" boundary-links="true"  ng-change="vmUsers.pageChanged()"></pagination>
+    
+		   	<table id="usuarios" class="table table-striped">
+				<tbody>
+				<tr>
+					<td><strong>id</strong></td>
+					<td><strong>nombre</strong></td>
+					<td><strong>apellidos</strong></td>
+					<td><strong>eMail</strong></td>
+					<td><strong>login</strong></td>
+					<td><strong>rol</strong></td>
+					<td><strong>op.</strong></td>
+				</tr>
+				<tr ng-repeat="user in vmUsers.usersPerPage | orderBy : 'name'">
+					<td><a href="#" ng-click="vmUsers.procesarId(user.id);">{{user.id}}</a></td>
+					<td>{{user.name}}</td>
+					<td>{{user.surname}}</td>
+					<td>{{user.email}}</td>
+					<td>{{user.login}}</td>
+					<td>{{user.rol}}</td>
+					<td><a href="#" ng-click="vmUsers.procesarBorrar(user.id);"><span class="glyphicon glyphicon-remove"></span></a></td>
+				</tr>
+				</tbody>		
+			</table>
+			<pagination total-items="vmUsers.total" ng-model="vmUsers.currentPage" max-size="vmUsers.maxSize" class="pagination-sm" boundary-links="true" rotate="false" num-pages="vmUsers.noOfPages"  ng-change="vmUsers.pageChanged()"></pagination>
+   			<pre>Página: {{vmUsers.currentPage}} / {{vmUsers.noOfPages}}</pre>
+   <script type="text/ng-template" id="borrarmodalUser.html">
+        <div class="modal-header">
+            <h3 class="modal-title">Aviso</h3>
+        </div>
+        <div class="modal-body">
+        <p>¿Desea borrar el usuario permanentemente?</p>
+		</div>
+        <div class="modal-footer">
+            <button class="btn btn-primary" ng-click="ok()">OK</button>
+            <button class="btn btn-warning" ng-click="cancel()">Cancel</button>
+        </div>
+    </script>
+		    <div class="form">
+				<label>Nombre*:</label><input type="text" ng-model="vmUsers.name" class="form-control input-lg" placeholder="Nombre">
+				<label>Apellidos:</label><input type="text" ng-model="vmUsers.surname" class="form-control input-lg" placeholder="Apellidos">
+				<label>eMail:</label><input type="text" ng-model="vmUsers.email" class="form-control input-lg" placeholder="Correo electrónico">
+				<label>Login*:</label><input type="text" ng-model="vmUsers.login" class="form-control input-lg" placeholder="Login">
+				<label>Password*:</label><input type="password" ng-model="vmUsers.password" class="form-control input-lg" placeholder="Password">
+				
+				<label>Rol:</label>
+				<select ng-model="vmUsers.rol_id"  class="form-control input-lg" ng-change="vmUsers.changeRol();" id="rol">
+					<option value="0" selected>Seleccione un rol</option>
+		   			<option value="{{rol.id}}" ng-repeat="rol in vmUsers.roles">{{rol.descripcion}}</option>
+				</select>
+				
+				<label>Producto:</label>
+				<select ng-model="vmUsers.product_id"  class="form-control input-lg" id="product" disabled>
+					<option value="0" selected>Seleccione un producto</option>
+		   			<option value="{{product.id}}" ng-repeat="product in vmUsers.products">{{product.descripcion}}</option>
+				</select>
+				
+				<label>Delegación:</label>
+				<select ng-model="vmUsers.hq_id"  class="form-control input-lg" id="headquarter" disabled >
+		   			<option value="0" selected>Seleccione una delegación</option>
+		   			<option value="{{hq.id}}" ng-repeat="hq in vmUsers.headquarters">{{hq.descripcion}}</option>
+				</select>
+			
+				<label>Comerciantes:</label>
+				<select ng-model="vmUsers.merchant_id"  class="form-control input-lg" id="merchant" disabled>
+				    <option value="0" selected>Seleccione un cliente</option>
+		   			<option value="{{merchant.id}}" ng-repeat="merchant in vmUsers.merchants">{{merchant.descripcion}}</option>
+				</select>
+				<input type="button" value="Nuevo" ng-click="vmUsers.procesarNuevo();" class="btn btn-primary btn-lg btn-block"/>
+				<input type="button" value="Guardar" ng-click="vmUsers.procesarGuardar();" class="btn btn-primary btn-lg btn-block"/>  
+		    
+		    </div>
+		  </div>
+    </accordion-group>
+    <!-- PRODUCTOS -->    
+    <accordion-group heading="Gestión de productos"  is-disabled="vmAdmin.productsDisabled">
+            <div ng-controller="aProductsCtrl as vmProducts">
+     		<pagination total-items="vmProducts.total" ng-model="vmProducts.currentPage" max-size="vmProducts.maxSize" class="pagination-sm" boundary-links="true"  ng-change="vmProducts.pageChanged()"></pagination>
+    
+		   	<table id="productos" class="table table-striped">
+				<tbody>
+				<tr>
+					<td><strong>id</strong></td>
+					<td><strong>descripción</strong></td>
+					<td><strong>precio</strong></td>
+					<td><strong>imagen</strong></td>
+					<td><strong>delegación</strong></td>
+					<td><strong>op.</strong></td>
+				</tr>
+				<tr ng-repeat="product in vmProducts.productsPerPage">
+					<td><a href="#" ng-click="vmProducts.procesarId(product.id);">{{product.id}}</a></td>
+					<td>{{product.descripcion}}</td>
+					<td>{{product.precio}}</td>
+					<td>{{product.imagen}}</td>
+					<td>{{product.headquarter}}</td>
+					<td><a href="#" ng-click="vmProducts.procesarBorrar(product.id);"><span class="glyphicon glyphicon-remove"></span></a></td>
+				</tr>
+				</tbody>		
+			</table>
+			<pagination total-items="vmProducts.total" ng-model="vmProducts.currentPage" max-size="vmProducts.maxSize" class="pagination-sm" boundary-links="true" rotate="false" num-pages="vmProducts.noOfPages"  ng-change="vmProducts.pageChanged()"></pagination>
+   			<pre>Página: {{vmProducts.currentPage}} / {{vmProducts.noOfPages}}</pre>
+   <script type="text/ng-template" id="borrarmodalProduct.html">
+        <div class="modal-header">
+            <h3 class="modal-title">Aviso</h3>
+        </div>
+        <div class="modal-body">
+        <p>¿Desea borrar el producto permanentemente?</p>
+		</div>
+        <div class="modal-footer">
+            <button class="btn btn-primary" ng-click="ok()">OK</button>
+            <button class="btn btn-warning" ng-click="cancel()">Cancel</button>
+        </div>
+    </script>
+		    <div class="form">
+				<label>Descripción*:</label><input type="text" ng-model="vmProducts.descripcion" class="form-control input-lg" placeholder="Descripción">
+				<label>Precio*:</label><input type="text" ng-model="vmProducts.precio" class="form-control input-lg" placeholder="Precio">
+				<label>Imagen*:</label><input type="file" file-model="vmProducts.imagen" class="form-control input-lg" placeholder="Archivo de imagen"/>
+				<label>Delegación:</label>
+				<select ng-model="vmProducts.hq_id"  class="form-control input-lg" id="headquarter">
+		   			<option value="0" selected>Seleccione una delegación</option>
+		   			<option value="{{hq.id}}" ng-repeat="hq in vmProducts.headquarters">{{hq.descripcion}}</option>
+				</select>
+				
+				<input type="button" value="Nuevo" ng-click="vmProducts.procesarNuevo();" class="btn btn-primary btn-lg btn-block"/>
+				<input type="button" value="Guardar" ng-click="vmProducts.procesarGuardar();" class="btn btn-primary btn-lg btn-block"/>  
+		    
+		    </div>
+		  </div>
+    </accordion-group> 
+    <!-- DELEGACIONES -->    
+    <accordion-group heading="Gestión de delegaciones"  is-disabled="vmAdmin.headquartersDisabled" >
+            <div ng-controller="aHeadquartesCtrl as vmHQs">
+     		<pagination total-items="vmHQs.total" ng-model="vmHQs.currentPage" max-size="vmHQs.maxSize" class="pagination-sm" boundary-links="true"  ng-change="vmHQs.pageChanged()"></pagination>
+    
+		   	<table id="headquarter" class="table table-striped">
+				<tbody>
+				<tr>
+					<td><strong>id</strong></td>
+					<td><strong>descripción</strong></td>
+					<td><strong>Comerciante</strong></td>
+					<td><strong>op.</strong></td>
+				</tr>
+				<tr ng-repeat="headquarter in vmHQs.headquartersPerPage">
+					<td><a href="#" ng-click="vmHQs.procesarId(headquarter.id);">{{headquarter.id}}</a></td>
+					<td>{{headquarter.descripcion}}</td>
+					<td>{{hearquarter.merchant}}</td>
+					<td><a href="#" ng-click="vmHQs.procesarBorrar(headquarter.id);"><span class="glyphicon glyphicon-remove"></span></a></td>
+				</tr>
+				</tbody>		
+			</table>
+			<pagination total-items="vmHQs.total" ng-model="vmHQs.currentPage" max-size="vmHQs.maxSize" class="pagination-sm" boundary-links="true" rotate="false" num-pages="vmHQs.noOfPages"  ng-change="vmHQs.pageChanged()"></pagination>
+   			<pre>Página: {{vmHQs.currentPage}} / {{vmHQs.noOfPages}}</pre>
+   <script type="text/ng-template" id="borrarmodalHeadquarter.html">
+        <div class="modal-header">
+            <h3 class="modal-title">Aviso</h3>
+        </div>
+        <div class="modal-body">
+        <p>¿Desea borrar la delegación permanentemente?</p>
+		</div>
+        <div class="modal-footer">
+            <button class="btn btn-primary" ng-click="ok()">OK</button>
+            <button class="btn btn-warning" ng-click="cancel()">Cancel</button>
+        </div>
+    </script>
+		    <div class="form">
+				<label>Descripción*:</label><input type="text" ng-model="vmHQs.descripcion" class="form-control input-lg" placeholder="Descripción">
+				<label>Comerciante:</label>
+				<select ng-model="vmHQs.merchant_id"  class="form-control input-lg" id="merchant">
+		   			<option value="0" selected>Seleccione un comerciante</option>
+		   			<option value="{{merchant.id}}" ng-repeat="merchant in vmHQs.merchants">{{merchant.descripcion}}</option>
+				</select>
+			 	<label>Dirección*:</label>
+    			<input type="text" ng-model="vmHQs.direccion" placeholder="Dirección de la delegación" typeahead="direccion as item.direccion for item in vmHQs.getLocation($viewValue) "
+    			typeahead-on-select='vmHQs.onSelect($item)'  typeahead-loading="loadingLocations" class="form-control" ng-change="vmHQs.onChange();">
+   					 <i ng-show="loadingLocations" class="glyphicon glyphicon-refresh"></i>
+   				<div id="map_canvas" style="width:300px; height:300px"></div>
+				<input type="button" value="Nuevo" ng-click="vmHQs.procesarNuevo();" class="btn btn-primary btn-lg btn-block"/>
+				<input type="button" value="Guardar" ng-click="vmHQs.procesarGuardar();" class="btn btn-primary btn-lg btn-block"/>  
+		    
+		    </div>
+		  </div>
+    </accordion-group> 
+    <!-- MERCHANTS -->    
+    <accordion-group heading="Gestión de comerciantes"  is-disabled="vmAdmin.merchantsDisabled">
+            <div ng-controller="aMerchantsCtrl as vmMerchants">
+     		<pagination total-items="vmMerchants.total" ng-model="vmMerchants.currentPage" max-size="vmMerchants.maxSize" class="pagination-sm" boundary-links="true"  ng-change="vmMerchants.pageChanged()"></pagination>
+    
+		   	<table id="headquarter" class="table table-striped">
+				<tbody>
+				<tr>
+					<td><strong>id</strong></td>
+					<td><strong>descripción</strong></td>
+					<td><strong>op.</strong></td>
+				</tr>
+				<tr ng-repeat="merchant in vmMerchants.merchantsPerPage">
+					<td><a href="#" ng-click="vmMerchants.procesarId(merchant.id);">{{merchant.id}}</a></td>
+					<td>{{merchant.descripcion}}</td>
+					<td><a href="#" ng-click="vmMerchants.procesarBorrar(merchant.id);"><span class="glyphicon glyphicon-remove"></span></a></td>
+				</tr>
+				</tbody>		
+			</table>
+			<pagination total-items="vmMerchants.total" ng-model="vmMerchants.currentPage" max-size="vmMerchants.maxSize" class="pagination-sm" boundary-links="true" rotate="false" num-pages="vmMerchants.noOfPages"  ng-change="vmMerchants.pageChanged()"></pagination>
+   			<pre>Página: {{vmMerchants.currentPage}} / {{vmMerchants.noOfPages}}</pre>
+   <script type="text/ng-template" id="borrarmodalMerchant.html">
+        <div class="modal-header">
+            <h3 class="modal-title">Aviso</h3>
+        </div>
+        <div class="modal-body">
+        <p>¿Desea borrar el comerciante permanentemente?</p>
+		</div>
+        <div class="modal-footer">
+            <button class="btn btn-primary" ng-click="ok()">OK</button>
+            <button class="btn btn-warning" ng-click="cancel()">Cancel</button>
+        </div>
+    </script>
+		    <div class="form">
+				<label>Descripción*:</label><input type="text" ng-model="vmMerchants.descripcion" class="form-control input-lg" placeholder="Descripción">
+			
+				<input type="button" value="Nuevo" ng-click="vmMerchants.procesarNuevo();" class="btn btn-primary btn-lg btn-block"/>
+				<input type="button" value="Guardar" ng-click="vmMerchants.procesarGuardar();" class="btn btn-primary btn-lg btn-block"/>  
+		    
+		    </div>
+		  </div>
+    </accordion-group> 
+  </accordion>
+</div>
+</body>
+
+
+
+
+</html>

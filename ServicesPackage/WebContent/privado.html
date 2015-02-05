@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+	<title>Privado</title>
+	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.23/angular.min.js"></script>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css"/>
+	<script src="js/ui-bootstrap-tpls-0.12.0.min.js"></script>
+	<script src="js/constantes.js"></script>
+	<script src="js/services/services.js"></script> 
+	<script src="js/controllers/autenticacion.js"></script>
+	<script src="js/controllers/privado.js"></script>
+</head>
+<body>
+	<div ng-app="app" ng-controller="privadoCtrl as vm"> 
+		<div ng-app="app" ng-controller="autenticacionCtrl as vmAuth">
+			<div align="left" clear="both">
+				<ul class="breadcrumb">
+				  <li class="active"><a href="#">Privado</a></li>
+				</ul>
+			</div>
+			<div float="left" width="50%">
+				Bienvenido {{vmAuth.authName}}, con rol {{vmAuth.authRol}}. 
+			</div>
+			<div float="left" width="50%" align="right">
+			<a href="#" ng-click="vmAuth.procesarLogout();"><span class="glyphicon glyphicon-log-out">Salir</span></a>
+			</div>
+		</div>
+
+		<span class="pull-right"><a href="#" ng-click="vm.procesarIrAdministracion();">Administración</a></span>
+		
+		
+		<h1>PRODUCTOS</h1>
+		<div ng-controller="carrouselCtrl as vmCarrousel">
+		  <div style="height: 305px">
+		    <carousel interval="vmCarrousel.myInterval">
+		      <slide ng-repeat="slide in vmCarrousel.slides" active="slide.active">
+		        <img ng-src="{{slide.image}}" style="margin:auto;">
+		        <div class="carousel-caption">
+		          <h4>Foto {{$index}}</h4>
+		          <p>{{slide.text}}</p>
+		        </div>
+		      </slide>
+		    </carousel>
+		  </div>
+		</div>
+	</div>
+</body>
+</html>

@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://java.sun.com/xml/ns/javaee" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" version="2.5">
+  <servlet>
+    <servlet-name>service</servlet-name>
+    <servlet-class>com.smarthotel.servicepack.servlets.ServiceServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>service</servlet-name>
+    <url-pattern>/service</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <servlet-name>autenticacion</servlet-name>
+    <servlet-class>com.smarthotel.servicepack.servlets.AutenticationServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>autenticacion</servlet-name>
+    <url-pattern>/autenticacion</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <servlet-name>upload</servlet-name>
+    <servlet-class>com.smarthotel.servicepack.servlets.UploadServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>upload</servlet-name>
+    <url-pattern>/upload</url-pattern>
+  </servlet-mapping>  
+  <servlet>
+    <servlet-name>delete</servlet-name>
+    <servlet-class>com.smarthotel.servicepack.servlets.DeleteServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>delete</servlet-name>
+    <url-pattern>/delete</url-pattern>
+  </servlet-mapping>  
+  <listener>
+    <display-name>listenerConnection</display-name>
+    <listener-class>
+	   		com.smarthotel.servicepack.connection.ConnectionListener
+	  	</listener-class>
+  </listener>
+  <context-param>
+    <description>host and port o applications data base</description>
+    <param-name>APLDB_HOST</param-name>
+    <param-value>localhost</param-value>
+  </context-param>
+  <context-param>
+    <description>SID for applications data base</description>
+    <param-name>APLDB_SID</param-name>
+    <param-value>orcl</param-value>
+  </context-param>
+  <context-param>
+    <description>user for applications data base</description>
+    <param-name>APLDB_USER</param-name>
+    <param-value>root</param-value>
+  </context-param>
+  <context-param>
+    <description>password for applications data base</description>
+    <param-name>APLDB_PASSW</param-name>
+    <param-value>root</param-value>
+  </context-param>
+  <context-param>
+    <description>timeout for applications data base</description>
+    <param-name>APLDB_TIMEOUT</param-name>
+    <param-value>600000</param-value><!-- 60 -->
+  </context-param>
+  <context-param>
+    <description>driver for applications data base: ORACLE or MYSQL</description>
+    <param-name>APLDB_DRIVER</param-name>
+    <param-value>MYSQL</param-value>
+  </context-param>
+  <context-param>
+    <description>data base</description>
+    <param-name>APLDB_DB</param-name>
+    <param-value>cms</param-value>
+  </context-param>
+  <context-param>
+    <description>data base</description>
+    <param-name>APLDB_PORT</param-name>
+    <param-value>3306</param-value>
+  </context-param>
+  <session-config>
+    <session-timeout>30</session-timeout>
+  </session-config>
+  <filter>
+    <filter-name>simpleCORSFilter</filter-name>
+    <filter-class>
+        com.smarthotel.servicepack.filter.SimpleCORSFilter
+    </filter-class>
+  </filter>
+  <filter-mapping>
+    <filter-name>simpleCORSFilter</filter-name>
+    <url-pattern>/*</url-pattern>
+  </filter-mapping>
+  
+  <welcome-file-list>
+	<welcome-file>index.html</welcome-file>
+  </welcome-file-list>
+</web-app>

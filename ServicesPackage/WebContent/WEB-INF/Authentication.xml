@@ -1,0 +1,2 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Authentication table="USER" encrypt="md5" name="name" surname="surname" login="login" password="password"/>
